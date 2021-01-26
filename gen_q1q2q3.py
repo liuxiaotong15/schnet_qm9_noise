@@ -16,8 +16,6 @@ qm9data = QM9('./qm9.db', download=True)
 
 idx_lst = list(range(len(qm9data)))
 random.shuffle(idx_lst)
-print(idx_lst)
-
 
 # for p in qm9data.available_properties:
 #     print('-', p)
@@ -49,24 +47,26 @@ available_properties = [
         QM9.Cv,
         ]
 
-for k, v in props.items():
-    props[k] = v.numpy()
-
-# props[QM9.G][0] += 1
 
 q1 = AtomsData('./Q1.db', available_properties=available_properties)
 for idx in idx_lst[:q1_cnt]:
     at2, props = qm9data.get_properties(idx=idx)
+    for k, v in props.items():
+        props[k] = v.numpy()
     q1.add_systems([at2], [props])
 
 q2 = AtomsData('./Q2.db', available_properties=available_properties)
 for idx in idx_lst[q1_cnt:q1_cnt + q2_cnt]:
     at2, props = qm9data.get_properties(idx=idx)
+    for k, v in props.items():
+        props[k] = v.numpy()
     q2.add_systems([at2], [props])
 
 q3 = AtomsData('./Q3.db', available_properties=available_properties)
 for idx in idx_lst[q1_cnt + q2_cnt:]:
     at2, props = qm9data.get_properties(idx=idx)
+    for k, v in props.items():
+        props[k] = v.numpy()
     q3.add_systems([at2], [props])
 
 
