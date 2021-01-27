@@ -40,8 +40,7 @@ val_loader = spk.AtomsLoader(val, batch_size=100)
 
 atomrefs = qm9data.get_atomref(QM9.G)
 means, stddevs = train_loader.get_statistics(
-        # QM9.G, get_atomwise_statistics=True, single_atom_ref=atomrefs
-        QM9.G, single_atom_ref=atomrefs
+        QM9.G, divide_by_atoms=True, single_atom_ref=atomrefs
         )
 
 schnet = spk.representation.SchNet(
