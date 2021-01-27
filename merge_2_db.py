@@ -44,14 +44,14 @@ at_lst = []
 props_lst = []
 
 for i in range(len(qm9data1)):
-    at2, props = qm9data.get_properties(idx=i)
+    at2, props = qm9data1.get_properties(idx=i)
     for k, v in props.items():
         props[k] = v.numpy()
     at_lst.append(at2)
     props_lst.append(props)
 
 for i in range(len(qm9data2)):
-    at2, props = qm9data.get_properties(idx=i)
+    at2, props = qm9data2.get_properties(idx=i)
     for k, v in props.items():
         props[k] = v.numpy()
     at_lst.append(at2)
