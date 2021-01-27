@@ -9,6 +9,8 @@ import argparse
 parser = argparse.ArgumentParser(description='train from xxx.db')
 parser.add_argument('--train_db', '-t', required = True,
         help='xxx.db, input filename please')
+parser.add_argument('--previous', '-p',
+        help='a folder which contain previous best_model')
 args = parser.parse_args()
 print(args)
 
@@ -47,9 +49,14 @@ schnet = spk.representation.SchNet(
         cutoff=4., cutoff_network=spk.nn.cutoff.CosineCutoff
         )
 
-output_G = spk.atomistic.Atomwise(n_in=30, atomref=atomrefs[QM9.G], property=QM9.G,
+model = None
+if args.previous == None:
+    output_G = spk.atomistic.Atomwise(n_in=30, atomref=atomrefs[QM9.G], property=QM9.G,
                                            mean=means[QM9.G], stddev=stddevs[QM9.G])
-model = spk.AtomisticModel(representation=schnet, output_modules=output_G)
+    model = spk.AtomisticModel(representation=schnet, output_modules=output_G)
+else:
+    import torch
+    model = torch.load(os.path.join(args.previous, 'best_model'))
 
 
 from torch.optim import Adam
