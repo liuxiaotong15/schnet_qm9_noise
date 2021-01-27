@@ -67,7 +67,7 @@ def mse_loss(batch, result):
     return err_sq
 
 # build optimizer
-optimizer = Adam(model.parameters(), lr=1e-2)
+optimizer = Adam(model.parameters(), lr=1e-4)
 
 import schnetpack.train as trn
 
@@ -78,7 +78,8 @@ hooks = [
         trn.CSVHook(log_path=foldername, metrics=metrics),
         trn.ReduceLROnPlateauHook(
             optimizer,
-            patience=5, factor=0.8, min_lr=1e-6,
+            # patience=5, factor=0.8, min_lr=1e-6,
+            min_lr=1e-6,
             stop_after_min=True
             )
         ]
