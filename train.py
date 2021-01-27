@@ -1,74 +1,92 @@
-import logging
-from torch.optim import Adam
 import os
 import schnetpack as spk
-import schnetpack.atomistic.model
+from schnetpack import AtomsData
 from schnetpack.datasets import QM9
-from schnetpack.train import Trainer, CSVHook, ReduceLROnPlateauHook
-from schnetpack.train.metrics import MeanAbsoluteError
-from schnetpack.train import build_mse_loss
+import random
+import numpy as np
+import argparse
 
+parser = argparse.ArgumentParser(description='train from xxx.db')
+parser.add_argument('--train_db', '-t', required = True,
+        help='xxx.db, input filename please')
+args = parser.parse_args()
+print(args)
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+seed = 1234
+random.seed(seed)
+np.random.seed(seed)
 
-# basic settings
-model_dir = "qm9_model"
-os.makedirs(model_dir)
-properties = [QM9.U0]
+foldername = args.train_db.replace('.', '')
 
-# data preparation
-logging.info("get dataset")
-dataset = QM9("data/qm9.db", load_only=[QM9.U0])
+if not os.path.exists(foldername):
+    os.makedirs(foldername)
+else:
+    print('folder existed, delete it please...')
+    exit(0)
+
+qm9data = QM9(args.train_db, download=False, load_only=[QM9.G])
+
 train, val, test = spk.train_test_split(
-    dataset, 1000, 100, os.path.join(model_dir, "split.npz")
-)
+        data=qm9data,
+        num_train=int(0.8*len(qm9data)),
+        num_val=len(qm9data) - int(0.8*len(qm9data)),
+        split_file=os.path.join(foldername, "split.npz"),
+        )
 
-print(len(train), len(val), len(test))
-1/0
+train_loader = spk.AtomsLoader(train, batch_size=100, shuffle=True)
+val_loader = spk.AtomsLoader(val, batch_size=100)
 
-train_loader = spk.AtomsLoader(train, batch_size=64, shuffle=True)
-val_loader = spk.AtomsLoader(val, batch_size=64)
-
-# statistics
-atomrefs = dataset.get_atomref(properties)
+atomrefs = qm9data.get_atomref(QM9.G)
 means, stddevs = train_loader.get_statistics(
-    properties, divide_by_atoms=True, single_atom_ref=atomrefs
-)
+        # QM9.G, get_atomwise_statistics=True, single_atom_ref=atomrefs
+        QM9.G, single_atom_ref=atomrefs
+        )
 
-# model build
-logging.info("build model")
-representation = spk.SchNet(n_interactions=6)
-output_modules = [
-    spk.atomistic.Atomwise(
-        n_in=representation.n_atom_basis,
-        property=QM9.U0,
-        mean=means[QM9.U0],
-        stddev=stddevs[QM9.U0],
-        atomref=atomrefs[QM9.U0],
-    )
-]
-model = schnetpack.AtomisticModel(representation, output_modules)
+schnet = spk.representation.SchNet(
+        n_atom_basis=30, n_filters=30, n_gaussians=20, n_interactions=5,
+        cutoff=4., cutoff_network=spk.nn.cutoff.CosineCutoff
+        )
+
+output_G = spk.atomistic.Atomwise(n_in=30, atomref=atomrefs[QM9.G], property=QM9.G,
+                                           mean=means[QM9.G], stddev=stddevs[QM9.G])
+model = spk.AtomisticModel(representation=schnet, output_modules=output_G)
+
+
+from torch.optim import Adam
+
+# loss function
+def mse_loss(batch, result):
+    diff = batch[QM9.U0]-result[QM9.U0]
+    err_sq = torch.mean(diff ** 2)
+    return err_sq
 
 # build optimizer
-optimizer = Adam(model.parameters(), lr=1e-4)
+optimizer = Adam(model.parameters(), lr=1e-2)
 
-# hooks
-logging.info("build trainer")
-metrics = [MeanAbsoluteError(p, p) for p in properties]
-hooks = [CSVHook(log_path=model_dir, metrics=metrics), ReduceLROnPlateauHook(optimizer)]
+import schnetpack.train as trn
 
-# trainer
-loss = build_mse_loss(properties)
-trainer = Trainer(
-    model_dir,
-    model=model,
-    hooks=hooks,
-    loss_fn=loss,
-    optimizer=optimizer,
-    train_loader=train_loader,
-    validation_loader=val_loader,
-)
+loss = trn.build_mse_loss([QM9.G])
 
-# run training
-logging.info("training")
-trainer.train(device="cpu")
+metrics = [spk.metrics.MeanAbsoluteError(QM9.G)]
+hooks = [
+        trn.CSVHook(log_path=foldername, metrics=metrics),
+        trn.ReduceLROnPlateauHook(
+            optimizer,
+            patience=5, factor=0.8, min_lr=1e-6,
+            stop_after_min=True
+            )
+        ]
+
+trainer = trn.Trainer(
+        model_path=foldername,
+        model=model,
+        hooks=hooks,
+        loss_fn=loss,
+        optimizer=optimizer,
+        train_loader=train_loader,
+        validation_loader=val_loader,
+        )
+
+device = "cpu" # change to 'cpu' if gpu is not available
+n_epochs = 300 # takes about 10 min on a notebook GPU. reduces for playing around
+trainer.train(device=device, n_epochs=n_epochs)
