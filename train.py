@@ -35,8 +35,8 @@ train, val, test = spk.train_test_split(
         split_file=os.path.join(foldername, "split.npz"),
         )
 
-train_loader = spk.AtomsLoader(train, batch_size=100, shuffle=True)
-val_loader = spk.AtomsLoader(val, batch_size=100)
+train_loader = spk.AtomsLoader(train, batch_size=64, shuffle=True)
+val_loader = spk.AtomsLoader(val, batch_size=64)
 
 atomrefs = qm9data.get_atomref(QM9.G)
 means, stddevs = train_loader.get_statistics(
