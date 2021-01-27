@@ -49,25 +49,37 @@ available_properties = [
 
 
 q1 = AtomsData('./Q1.db', available_properties=available_properties)
+at_lst = []
+props_lst = []
 for idx in idx_lst[:q1_cnt]:
     at2, props = qm9data.get_properties(idx=idx)
     for k, v in props.items():
         props[k] = v.numpy()
-    q1.add_systems([at2], [props])
+    at_lst.append(at2)
+    props_lst.append(props)
+q1.add_systems(at_lst, props_lst)
 
 q2 = AtomsData('./Q2.db', available_properties=available_properties)
+at_lst = []
+props_lst = []
 for idx in idx_lst[q1_cnt:q1_cnt + q2_cnt]:
     at2, props = qm9data.get_properties(idx=idx)
     for k, v in props.items():
         props[k] = v.numpy()
-    q2.add_systems([at2], [props])
+    at_lst.append(at2)
+    props_lst.append(props)
+q2.add_systems([at2], [props])
 
 q3 = AtomsData('./Q3.db', available_properties=available_properties)
+at_lst = []
+props_lst = []
 for idx in idx_lst[q1_cnt + q2_cnt:]:
     at2, props = qm9data.get_properties(idx=idx)
     for k, v in props.items():
         props[k] = v.numpy()
-    q3.add_systems([at2], [props])
+    at_lst.append(at2)
+    props_lst.append(props)
+q3.add_systems([at2], [props])
 
 
 # new_dataset.add_systems([at2], [props])
