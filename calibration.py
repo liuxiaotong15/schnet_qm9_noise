@@ -63,11 +63,11 @@ for i in range(len(qm9data)):
     input_atoms = converter(at)
     # apply model
     pred = best_model(input_atoms)
-    props[QM9.G][0] = (props[QM9.G][0] + pred) / 2
+    props[QM9.G][0] = (props[QM9.G][0] + pred[QM9.G].detach().cpu().numpy()[0, 0]) / 2
     at_lst.append(at)
     props_lst.append(props)
 
 
-new_dataset = AtomsData(args.output_db, available_properties=available_properties)
+new_dataset = AtomsData(args.output_db, available_properties=[QM9.G]) #available_properties)
 
 new_dataset.add_systems(at_lst, props_lst)
