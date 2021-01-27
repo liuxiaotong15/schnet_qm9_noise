@@ -9,3 +9,12 @@ python add_noise.py -n 1 -i Q2.db -o Q21.db
 python merge_2_db.py -f Q1.db -s Q2.db -o Q1Q2.db
 
 python merge_2_db.py -f Q13.db -s Q21.db -o Q13Q21.db
+
+python train.py -t Q1Q2.db
+
+python evaluate.py -t Q3.db -f Q1Q2db
+
+python train.py -t Q13Q21.db
+
+python evaluate.py -t Q3.db -f Q13Q21db
+
