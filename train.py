@@ -63,7 +63,7 @@ from torch.optim import Adam
 
 # loss function
 def mse_loss(batch, result):
-    diff = batch[QM9.U0]-result[QM9.U0]
+    diff = batch[QM9.G]-result[QM9.G]
     err_sq = torch.mean(diff ** 2)
     return err_sq
 
