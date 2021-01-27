@@ -1,5 +1,7 @@
 # schnet_qm9_noise
 
+(if not run first) rm -rf \*db
+
 python gen_q1q2q3.py
 
 python add_noise.py -n 3 -i Q1.db -o Q13.db
