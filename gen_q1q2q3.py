@@ -68,7 +68,7 @@ for idx in idx_lst[q1_cnt:q1_cnt + q2_cnt]:
         props[k] = v.numpy()
     at_lst.append(at2)
     props_lst.append(props)
-q2.add_systems([at2], [props])
+q2.add_systems(at_lst, props_lst)
 
 q3 = AtomsData('./Q3.db', available_properties=available_properties)
 at_lst = []
@@ -79,8 +79,7 @@ for idx in idx_lst[q1_cnt + q2_cnt:]:
         props[k] = v.numpy()
     at_lst.append(at2)
     props_lst.append(props)
-q3.add_systems([at2], [props])
-
+q3.add_systems(at_lst, props_lst)
 
 # new_dataset.add_systems([at2], [props])
 # print('-' * 100)
