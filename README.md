@@ -12,11 +12,29 @@ python merge_2_db.py -f Q1.db -s Q2.db -o Q1Q2.db
 
 python merge_2_db.py -f Q13.db -s Q21.db -o Q13Q21.db
 
+-------------------------------------------------------
+
 python train.py -t Q1Q2.db
 
 python evaluate.py -t Q3.db -f Q1Q2db
 
+-------------------------------------------------------
+
 python train.py -t Q13Q21.db
 
 python evaluate.py -t Q3.db -f Q13Q21db
+
+--------------------------------------------------------
+
+python train.py -t Q13.db
+
+python train.py -t Q21.db -p Q13db
+
+python calibration.py -i Q13.db -o Q13E.db -f Q21db
+
+python merge_2_db.py -f Q13E.db -s Q21.db -o Q13EQ21.db
+
+python train.py -t Q13EQ21.db
+
+python evaluate.py -t Q3.db -f Q13EQ21db
 
