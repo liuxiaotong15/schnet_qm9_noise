@@ -6,6 +6,8 @@ import random
 import numpy as np
 import argparse
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 parser = argparse.ArgumentParser(description='train from xxx.db')
 parser.add_argument('--train_db', '-t', required = True,
         help='xxx.db, input filename please')
@@ -35,8 +37,8 @@ train, val, test = spk.train_test_split(
         split_file=os.path.join(foldername, "split.npz"),
         )
 
-train_loader = spk.AtomsLoader(train, batch_size=64, shuffle=True)
-val_loader = spk.AtomsLoader(val, batch_size=64)
+train_loader = spk.AtomsLoader(train, batch_size=1024, shuffle=True)
+val_loader = spk.AtomsLoader(val, batch_size=1024)
 
 atomrefs = qm9data.get_atomref(QM9.G)
 means, stddevs = train_loader.get_statistics(
@@ -94,6 +96,6 @@ trainer = trn.Trainer(
         validation_loader=val_loader,
         )
 
-device = "cpu" # change to 'cpu' if gpu is not available
-n_epochs = 300 # takes about 10 min on a notebook GPU. reduces for playing around
+device = "cuda" # change to 'cpu' if gpu is not available
+n_epochs = 100000 # takes about 10 min on a notebook GPU. reduces for playing around
 trainer.train(device=device, n_epochs=n_epochs)
