@@ -1,6 +1,6 @@
 # schnet_qm9_noise
 
-(if not run first) rm -rf \*db
+(if not first time run) rm -rf \*db
 
 python gen_q1q2q3.py
 
