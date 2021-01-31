@@ -19,6 +19,8 @@ parser.add_argument('--folder', '-f', required = True,
 args = parser.parse_args()
 print(args)
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
 seed = 1234
 random.seed(seed)
 np.random.seed(seed)
@@ -47,7 +49,7 @@ qm9data = QM9(args.input_db, download=False, load_only=[QM9.G])
 import torch
 best_model = torch.load(os.path.join(args.folder, 'best_model'))
 
-device = 'cpu'
+device = 'cuda'
 err = 0
 
 converter = spk.data.AtomsConverter(device=device)
