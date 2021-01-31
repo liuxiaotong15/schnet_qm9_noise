@@ -44,7 +44,7 @@ available_properties = [
         ]
 
 
-qm9data = QM9(args.input_db, download=False, load_only=[QM9.G])
+qm9data = QM9(args.input_db, download=False)
 
 import torch
 best_model = torch.load(os.path.join(args.folder, 'best_model'))
