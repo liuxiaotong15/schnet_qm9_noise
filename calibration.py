@@ -70,6 +70,6 @@ for i in range(len(qm9data)):
     props_lst.append(props)
 
 
-new_dataset = AtomsData(args.output_db, available_properties=[QM9.G]) #available_properties)
+new_dataset = AtomsData(args.output_db, available_properties=available_properties) #available_properties)
 
 new_dataset.add_systems(at_lst, props_lst)
