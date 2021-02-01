@@ -16,13 +16,13 @@ python merge_2_db.py -f Q13.db -s Q21.db -o Q13Q21.db
 
 python train.py -t Q1Q2.db
 
-python evaluate.py -t Q3.db -f Q1Q2db
+**python evaluate.py -t Q3.db -f Q1Q2db**
 
 -------------------------------------------------------
 
 python train.py -t Q13Q21.db
 
-python evaluate.py -t Q3.db -f Q13Q21db
+**python evaluate.py -t Q3.db -f Q13Q21db**
 
 --------------------------------------------------------
 
@@ -36,6 +36,6 @@ python merge_2_db.py -f Q13E.db -s Q21.db -o Q13EQ21.db
 
 python train.py -t Q13EQ21.db
 
-python evaluate.py -t Q3.db -f Q21db
+**python evaluate.py -t Q3.db -f Q21db**
 
-python evaluate.py -t Q3.db -f Q13EQ21db
+**python evaluate.py -t Q3.db -f Q13EQ21db**
