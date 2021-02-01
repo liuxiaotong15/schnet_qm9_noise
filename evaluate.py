@@ -28,7 +28,7 @@ test_loader = spk.AtomsLoader(qm9data, batch_size=100, shuffle=True)
 import torch
 best_model = torch.load(os.path.join(args.folder, 'best_model'))
 
-device = 'cpu'
+device = 'cuda'
 err = 0
 print(len(test_loader))
 for count, batch in enumerate(test_loader):
